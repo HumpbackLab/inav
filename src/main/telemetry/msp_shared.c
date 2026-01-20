@@ -68,12 +68,12 @@ void initSharedMsp(void)
     mspPackage.requestBuffer = (uint8_t *)&mspRxBuffer;
     mspPackage.requestPacket = &mspRxPacket;
     mspPackage.requestPacket->buf.ptr = mspPackage.requestBuffer;
-    mspPackage.requestPacket->buf.end = mspPackage.requestBuffer;
+    mspPackage.requestPacket->buf.end = mspPackage.requestBuffer + sizeof(mspRxBuffer);
 
     mspPackage.responseBuffer = (uint8_t *)&mspTxBuffer;
     mspPackage.responsePacket = &mspTxPacket;
     mspPackage.responsePacket->buf.ptr = mspPackage.responseBuffer;
-    mspPackage.responsePacket->buf.end = mspPackage.responseBuffer;
+    mspPackage.responsePacket->buf.end = mspPackage.responseBuffer + sizeof(mspTxBuffer);
 }
 
 static void processMspPacket(void)
