@@ -217,7 +217,7 @@ bool sendMspReply(uint8_t payloadSize, mspResponseFnPtr responseFn)
         }
         sbufWriteU8(payloadBuf, status);
 
-        const uint8_t size = sbufBytesRemaining(txBuf);
+        const uint16_t size = sbufBytesRemaining(txBuf);
         if (lastRequestVersion == 1) { // MSPv1
             sbufWriteU8(payloadBuf, size);
             sbufWriteU8(payloadBuf, mspPackage.responsePacket->cmd);
