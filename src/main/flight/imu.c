@@ -834,11 +834,11 @@ static void imuCalculateEstimatedAttitude(float dT)
         //velned centrifugal force compensation, quad will use this method
         vectorAdd(&compansatedGravityBF, &imuMeasuredAccelBF, &vEstcentrifugalAccelBF_velned);
     }
-    else if (STATE(AIRPLANE))
-    {
-        //turnrate centrifugal force compensation
-        vectorAdd(&compansatedGravityBF, &imuMeasuredAccelBF, &vEstcentrifugalAccelBF_turnrate);
-    }
+    // else if (STATE(AIRPLANE))
+    // {
+    //     //turnrate centrifugal force compensation
+    //     vectorAdd(&compansatedGravityBF, &imuMeasuredAccelBF, &vEstcentrifugalAccelBF_turnrate);
+    // }
     else
     {
         compansatedGravityBF = imuMeasuredAccelBF;
