@@ -5282,6 +5282,7 @@
 | `SERVO_TYPE_PWM` | 0 |  |
 | `SERVO_TYPE_SBUS` | 1 |  |
 | `SERVO_TYPE_SBUS_PWM` | 2 |  |
+| `SERVO_TYPE_PWM_INV` | 3 |  |
 
 ---
 ## <a id="enum-setting_mode_e"></a>`setting_mode_e`

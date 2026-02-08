@@ -643,6 +643,14 @@ static void pwmServoWriteStandard(uint8_t index, uint16_t value)
     }
 }
 
+static void pwmServoWriteInverted(uint8_t index, uint16_t value)
+{
+    if (index < MAX_SERVOS && servos[index]) {
+        timCCR_t invertedValue = PWM_TIMER_HZ/servoConfig()->servoPwmRate - value;
+        *servos[index]->ccr = invertedValue;
+    }
+}
+
 #ifdef USE_SERVO_SBUS
 static void sbusPwmWriteStandard(uint8_t index, uint16_t value)
 {
@@ -658,6 +666,10 @@ void pwmServoPreconfigure(void)
         default:
         case SERVO_TYPE_PWM:
             servoWritePtr = pwmServoWriteStandard;
+            break;
+
+        case SERVO_TYPE_PWM_INV:
+            servoWritePtr = pwmServoWriteInverted;
             break;
 
 #ifdef USE_SERVO_SBUS

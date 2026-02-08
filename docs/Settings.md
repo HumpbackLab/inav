@@ -6084,7 +6084,7 @@ Selects the servo PWM output cutoff frequency. Value is in [Hz]
 
 ### servo_protocol
 
-An option to chose the protocol/option that would be used to output servo data. Possible options `PWM` (FC servo outputs), `SBUS` (S.Bus protocol output via a configured serial port)
+An option to chose the protocol/option that would be used to output servo data. Possible options `PWM` (FC servo outputs), `SBUS` (S.Bus protocol output via a configured serial port), `PWM_INV` (PWM with inverted duty cycle)
 
 | Default | Min | Max |
 | --- | --- | --- |

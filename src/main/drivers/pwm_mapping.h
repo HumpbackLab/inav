@@ -50,7 +50,8 @@ typedef enum {
 typedef enum {
     SERVO_TYPE_PWM = 0,
     SERVO_TYPE_SBUS,
-    SERVO_TYPE_SBUS_PWM
+    SERVO_TYPE_SBUS_PWM,
+    SERVO_TYPE_PWM_INV
 } servoProtocolType_e;
 
 typedef enum {
