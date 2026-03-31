@@ -29,7 +29,7 @@ tables:
   - name: motor_pwm_protocol
     values: ["STANDARD", "ONESHOT125", "MULTISHOT", "BRUSHED", "DSHOT150", "DSHOT300", "DSHOT600"]
   - name: servo_protocol
-    values: ["PWM", "SBUS", "SBUS_PWM", "PWM_INV"]
+    values: ["PWM", "SBUS", "SBUS_PWM", "PWM_INV", "PWM_FLAPPING"]
   - name: failsafe_procedure
     values: ["LAND", "DROP", "RTH", "NONE"]
   - name: current_sensor
@@ -1325,10 +1325,16 @@ groups:
     headers: ["flight/servos.h"]
     members:
       - name: servo_protocol
-        description: "An option to chose the protocol/option that would be used to output servo data. Possible options `PWM` (FC servo outputs), `SBUS` (S.Bus protocol output via a configured serial port), `PWM_INV` (PWM with inverted duty cycle)"
+        description: "An option to chose the protocol/option that would be used to output servo data. Possible options `PWM` (FC servo outputs), `SBUS` (S.Bus protocol output via a configured serial port), `PWM_INV` (PWM with inverted duty cycle), `PWM_FLAPPING` (normal PWM signaling with throttle-controlled flapping motion around the commanded midpoint)"
         default_value: "PWM"
         field: servo_protocol
         table: servo_protocol
+      - name: servo_flapping_freq
+        description: "Maximum mechanical flapping frequency in Hz for `PWM_FLAPPING`. Throttle is mapped linearly from 0Hz at low stick to this value at full stick."
+        default_value: 10
+        field: servo_flapping_freq
+        min: 1
+        max: 50
       - name: servo_center_pulse
         description: "Servo midpoint"
         default_value: 1500
