@@ -30,6 +30,8 @@ tables:
     values: ["STANDARD", "ONESHOT125", "MULTISHOT", "BRUSHED", "DSHOT150", "DSHOT300", "DSHOT600"]
   - name: servo_protocol
     values: ["PWM", "SBUS", "SBUS_PWM", "PWM_INV", "PWM_FLAPPING"]
+  - name: flapping_waveform
+    values: ["COSINE", "ASYM_DOWN_FAST"]
   - name: failsafe_procedure
     values: ["LAND", "DROP", "RTH", "NONE"]
   - name: current_sensor
@@ -1335,6 +1337,11 @@ groups:
         field: servo_flapping_freq
         min: 1
         max: 50
+      - name: servo_flapping_waveform
+        description: "Waveform used by `PWM_FLAPPING`. `COSINE` is symmetric and starts from an endpoint. `ASYM_DOWN_FAST` compresses the positive stroke into a shorter time slice, so that stroke is faster; reverse the servo if your mechanism needs the opposite direction."
+        default_value: "COSINE"
+        field: servo_flapping_waveform
+        table: flapping_waveform
       - name: servo_center_pulse
         description: "Servo midpoint"
         default_value: 1500

@@ -166,6 +166,7 @@ typedef struct servoConfig_s {
     uint16_t servoCenterPulse;              // This is the value for servos when they should be in the middle. e.g. 1500.
     uint16_t servoPwmRate;                  // The update rate of servo outputs (50-498Hz)
     uint8_t servo_flapping_freq;            // Max mechanical flapping frequency in Hz when throttle is at full scale
+    uint8_t servo_flapping_waveform;        // See flappingWaveformType_e
     int16_t servo_lowpass_freq;             // lowpass servo filter frequency selection; 1/1000ths of loop freq
     uint16_t flaperon_throw_offset;
     uint8_t servo_protocol;                 // See servoProtocolType_e

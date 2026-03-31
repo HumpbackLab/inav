@@ -656,6 +656,36 @@ static void pwmServoWriteInverted(uint8_t index, uint16_t value)
     }
 }
 
+typedef enum {
+    FLAPPING_WAVEFORM_COSINE = 0,
+    FLAPPING_WAVEFORM_ASYM_DOWN_FAST
+} flappingWaveformType_e;
+
+static float getFlappingWaveformOffset(float phase)
+{
+    switch (servoConfig()->servo_flapping_waveform) {
+    default:
+    case FLAPPING_WAVEFORM_COSINE:
+        return cos_approx(phase);
+
+    case FLAPPING_WAVEFORM_ASYM_DOWN_FAST: {
+        const float cycle = phase / (2.0f * M_PIf);
+        const float fastStrokePortion = 0.35f;
+        float remappedPhase;
+
+        if (cycle < fastStrokePortion) {
+            const float strokeProgress = cycle / fastStrokePortion;
+            remappedPhase = strokeProgress * M_PIf;
+        } else {
+            const float strokeProgress = (cycle - fastStrokePortion) / (1.0f - fastStrokePortion);
+            remappedPhase = M_PIf + strokeProgress * M_PIf;
+        }
+
+        return cos_approx(remappedPhase);
+    }
+    }
+}
+
 static void updateFlappingOffset(void)
 {
     const uint16_t throttle = constrain(mixerThrottleCommand, PWM_RANGE_MIN, PWM_RANGE_MAX);
@@ -677,7 +707,7 @@ static void updateFlappingOffset(void)
         servoFlappingPhase -= 2.0f * M_PIf;
     }
 
-    servoFlappingOffset = sin_approx(servoFlappingPhase);
+    servoFlappingOffset = getFlappingWaveformOffset(servoFlappingPhase);
 }
 
 static void pwmServoWriteFlapping(uint8_t index, uint16_t value)

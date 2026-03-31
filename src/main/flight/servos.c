@@ -60,12 +60,13 @@
 
 #include "sensors/gyro.h"
 
-PG_REGISTER_WITH_RESET_TEMPLATE(servoConfig_t, servoConfig, PG_SERVO_CONFIG, 4);
+PG_REGISTER_WITH_RESET_TEMPLATE(servoConfig_t, servoConfig, PG_SERVO_CONFIG, 5);
 
 PG_RESET_TEMPLATE(servoConfig_t, servoConfig,
     .servoCenterPulse = SETTING_SERVO_CENTER_PULSE_DEFAULT,
     .servoPwmRate = SETTING_SERVO_PWM_RATE_DEFAULT,             // Default for analog servos
     .servo_flapping_freq = SETTING_SERVO_FLAPPING_FREQ_DEFAULT,
+    .servo_flapping_waveform = SETTING_SERVO_FLAPPING_WAVEFORM_DEFAULT,
     .servo_lowpass_freq = SETTING_SERVO_LPF_HZ_DEFAULT,         // Default servo update rate is 50Hz, everything above Nyquist frequency (25Hz) is going to fold and cause distortions
     .servo_protocol = SETTING_SERVO_PROTOCOL_DEFAULT,
     .flaperon_throw_offset = SETTING_FLAPERON_THROW_OFFSET_DEFAULT,
