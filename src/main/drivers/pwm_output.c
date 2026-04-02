@@ -719,8 +719,11 @@ static void pwmServoWriteFlapping(uint8_t index, uint16_t value)
     if (index < MAX_SERVOS && servos[index]) {
         const uint16_t center = constrain(value, servoParams(index)->min, servoParams(index)->max);
         const int16_t amplitude = MIN(center - servoParams(index)->min, servoParams(index)->max - center);
-        const uint16_t flappingValue = lrintf(center + (amplitude * servoFlappingOffset));
-        *servos[index]->ccr = flappingValue;
+        const float servoPhaseOffset = (servoParams(index)->rate < 0) ? M_PIf : 0.0f;
+        const float flappingOffset = getFlappingWaveformOffset(servoFlappingPhase + servoPhaseOffset);
+        const uint16_t flappingValue = lrintf(center + (amplitude * flappingOffset));
+        //*servos[index]->ccr = flappingValue;
+        pwmServoWriteInverted(index, flappingValue); // we need to invert to apply for humpbacklab.
     }
 }
 
