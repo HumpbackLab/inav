@@ -1299,6 +1299,13 @@ groups:
         field: mixer_config.transition_PID_mmix_multiplier_yaw
         min: -5000
         max: 5000
+      - name: fw_diff_thrust_throttle_compensation
+        description: "Extra throttle compensation percentage applied in AIRPLANE mode to offset the lowest motor drop caused by differential thrust yaw mixing. 0 disables it, 100 compensates the full yaw-induced drop."
+        default_value: 0
+        field: mixer_config.fixedWingDifferentialThrustThrottleCompensation
+        type: uint8_t
+        min: 0
+        max: 200
 
   - name: PG_REVERSIBLE_MOTORS_CONFIG
     type: reversibleMotorsConfig_t

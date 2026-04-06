@@ -56,7 +56,8 @@ void pgResetFn_mixerProfiles(mixerProfile_t *instance)
                          .tailsitterOrientationOffset = SETTING_TAILSITTER_ORIENTATION_OFFSET_DEFAULT,
                          .transition_PID_mmix_multiplier_roll = SETTING_TRANSITION_PID_MMIX_MULTIPLIER_ROLL_DEFAULT,
                          .transition_PID_mmix_multiplier_pitch = SETTING_TRANSITION_PID_MMIX_MULTIPLIER_PITCH_DEFAULT,
-                         .transition_PID_mmix_multiplier_yaw = SETTING_TRANSITION_PID_MMIX_MULTIPLIER_YAW_DEFAULT
+                         .transition_PID_mmix_multiplier_yaw = SETTING_TRANSITION_PID_MMIX_MULTIPLIER_YAW_DEFAULT,
+                         .fixedWingDifferentialThrustThrottleCompensation = SETTING_FW_DIFF_THRUST_THROTTLE_COMPENSATION_DEFAULT
                      });
         for (int j = 0; j < MAX_SUPPORTED_MOTORS; j++)
         {
