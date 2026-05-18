@@ -45,6 +45,7 @@
 #include "drivers/timer_impl.h"
 #include "drivers/timer.h"
 #include "flight/mixer.h"
+#include "flight/servos.h"
 #include "rx/rx.h"
 
 #define MULTISHOT_5US_PW    (MULTISHOT_TIMER_HZ * 5 / 1000000.0f)
@@ -717,9 +718,11 @@ static void pwmServoWriteFlapping(uint8_t index, uint16_t value)
     }
 
     if (index < MAX_SERVOS && servos[index]) {
-        const uint16_t center = constrain(value, servoParams(index)->min, servoParams(index)->max);
-        const int16_t amplitude = MIN(center - servoParams(index)->min, servoParams(index)->max - center);
-        const float servoPhaseOffset = (servoParams(index)->rate < 0) ? M_PIf : 0.0f;
+        const uint8_t servoIndex = getMinServoIndex() + index;
+        const servoParam_t *servoParam = servoParams(servoIndex);
+        const uint16_t center = constrain(value, servoParam->min, servoParam->max);
+        const int16_t amplitude = MIN(center - servoParam->min, servoParam->max - center);
+        const float servoPhaseOffset = (servoParam->rate < 0) ? M_PIf : 0.0f;
         const float flappingOffset = getFlappingWaveformOffset(servoFlappingPhase + servoPhaseOffset);
         const uint16_t flappingValue = lrintf(center + (amplitude * flappingOffset));
         //*servos[index]->ccr = flappingValue;
