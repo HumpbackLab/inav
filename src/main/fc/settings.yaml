@@ -1299,14 +1299,6 @@ groups:
         field: mixer_config.transition_PID_mmix_multiplier_yaw
         min: -5000
         max: 5000
-      - name: fw_diff_thrust_throttle_compensation
-        description: "Extra throttle compensation percentage applied in AIRPLANE mode to offset the lowest motor drop caused by differential thrust yaw mixing. 0 disables it, 100 compensates the full yaw-induced drop."
-        default_value: 0
-        field: mixer_config.fixedWingDifferentialThrustThrottleCompensation
-        type: uint8_t
-        min: 0
-        max: 200
-
   - name: PG_REVERSIBLE_MOTORS_CONFIG
     type: reversibleMotorsConfig_t
     members:
@@ -1338,17 +1330,6 @@ groups:
         default_value: "PWM"
         field: servo_protocol
         table: servo_protocol
-      - name: servo_flapping_freq
-        description: "Maximum mechanical flapping frequency in Hz for `PWM_FLAPPING`. Throttle is mapped linearly from 0Hz at low stick to this value at full stick."
-        default_value: 10
-        field: servo_flapping_freq
-        min: 1
-        max: 50
-      - name: servo_flapping_waveform
-        description: "Waveform used by `PWM_FLAPPING`. `COSINE` is symmetric and starts from an endpoint. `ASYM_DOWN_FAST` compresses the positive stroke into a shorter time slice, so that stroke is faster; reverse the servo if your mechanism needs the opposite direction."
-        default_value: "COSINE"
-        field: servo_flapping_waveform
-        table: flapping_waveform
       - name: servo_center_pulse
         description: "Servo midpoint"
         default_value: 1500
@@ -4521,3 +4502,26 @@ groups:
         field: noWayHomeAction
         table: geozone_rth_no_way_home
         type: uint8_t
+
+  - name: PG_MANUFACTURER_CONFIG
+    type: manufacturerConfig_t
+    headers: ["flight/servos.h"]
+    members:
+      - name: fw_diff_thrust_throttle_compensation
+        description: "Extra throttle compensation percentage applied in AIRPLANE mode to offset the lowest motor drop caused by differential thrust yaw mixing. 0 disables it, 100 compensates the full yaw-induced drop."
+        default_value: 0
+        field: fixedWingDifferentialThrustThrottleCompensation
+        type: uint8_t
+        min: 0
+        max: 200
+      - name: servo_flapping_freq
+        description: "Maximum mechanical flapping frequency in Hz for `PWM_FLAPPING`. Throttle is mapped linearly from 0Hz at low stick to this value at full stick."
+        default_value: 10
+        field: servo_flapping_freq
+        min: 1
+        max: 50
+      - name: servo_flapping_waveform
+        description: "Waveform used by `PWM_FLAPPING`. `COSINE` is symmetric and starts from an endpoint. `ASYM_DOWN_FAST` compresses the positive stroke into a shorter time slice, so that stroke is faster; reverse the servo if your mechanism needs the opposite direction."
+        default_value: "COSINE"
+        field: servo_flapping_waveform
+        table: flapping_waveform

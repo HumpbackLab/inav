@@ -22,7 +22,6 @@ typedef struct mixerConfig_s {
     int16_t transition_PID_mmix_multiplier_roll;
     int16_t transition_PID_mmix_multiplier_pitch;
     int16_t transition_PID_mmix_multiplier_yaw;
-    uint8_t fixedWingDifferentialThrustThrottleCompensation;
 } mixerConfig_t;
 typedef struct mixerProfile_s {
     mixerConfig_t mixer_config;

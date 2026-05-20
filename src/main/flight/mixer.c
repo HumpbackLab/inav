@@ -479,7 +479,7 @@ static int16_t getFixedWingDifferentialThrustThrottleCompensation(int16_t yawInp
         return 0;
     }
 
-    if (currentMixerConfig.fixedWingDifferentialThrustThrottleCompensation == 0) {
+    if (manufacturerConfig()->fixedWingDifferentialThrustThrottleCompensation == 0) {
         return 0;
     }
 
@@ -505,7 +505,7 @@ static int16_t getFixedWingDifferentialThrustThrottleCompensation(int16_t yawInp
         return 0;
     }
 
-    return lrintf(-minYawMix * currentMixerConfig.fixedWingDifferentialThrustThrottleCompensation / 100.0f);
+    return lrintf(-minYawMix * manufacturerConfig()->fixedWingDifferentialThrustThrottleCompensation / 100.0f);
 }
 
 static int getReversibleMotorsThrottleDeadband(void)

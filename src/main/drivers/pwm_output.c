@@ -664,7 +664,7 @@ typedef enum {
 
 static float getFlappingWaveformOffset(float phase)
 {
-    switch (servoConfig()->servo_flapping_waveform) {
+    switch (manufacturerConfig()->servo_flapping_waveform) {
     default:
     case FLAPPING_WAVEFORM_COSINE:
         return cos_approx(phase);
@@ -690,7 +690,7 @@ static float getFlappingWaveformOffset(float phase)
 static void updateFlappingOffset(void)
 {
     const uint16_t throttle = constrain(mixerThrottleCommand, PWM_RANGE_MIN, PWM_RANGE_MAX);
-    const float flappingFrequencyHz = ((float)(throttle - PWM_RANGE_MIN) * servoConfig()->servo_flapping_freq) / (PWM_RANGE_MAX - PWM_RANGE_MIN);
+    const float flappingFrequencyHz = ((float)(throttle - PWM_RANGE_MIN) * manufacturerConfig()->servo_flapping_freq) / (PWM_RANGE_MAX - PWM_RANGE_MIN);
     const timeUs_t currentTimeUs = micros();
 
     if (servoFlappingLastUpdateUs == 0 || flappingFrequencyHz <= 0.0f) {

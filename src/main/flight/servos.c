@@ -60,13 +60,11 @@
 
 #include "sensors/gyro.h"
 
-PG_REGISTER_WITH_RESET_TEMPLATE(servoConfig_t, servoConfig, PG_SERVO_CONFIG, 5);
+PG_REGISTER_WITH_RESET_TEMPLATE(servoConfig_t, servoConfig, PG_SERVO_CONFIG, 3);
 
 PG_RESET_TEMPLATE(servoConfig_t, servoConfig,
     .servoCenterPulse = SETTING_SERVO_CENTER_PULSE_DEFAULT,
     .servoPwmRate = SETTING_SERVO_PWM_RATE_DEFAULT,             // Default for analog servos
-    .servo_flapping_freq = SETTING_SERVO_FLAPPING_FREQ_DEFAULT,
-    .servo_flapping_waveform = SETTING_SERVO_FLAPPING_WAVEFORM_DEFAULT,
     .servo_lowpass_freq = SETTING_SERVO_LPF_HZ_DEFAULT,         // Default servo update rate is 50Hz, everything above Nyquist frequency (25Hz) is going to fold and cause distortions
     .servo_protocol = SETTING_SERVO_PROTOCOL_DEFAULT,
     .flaperon_throw_offset = SETTING_FLAPERON_THROW_OFFSET_DEFAULT,
@@ -74,6 +72,13 @@ PG_RESET_TEMPLATE(servoConfig_t, servoConfig,
     .servo_autotrim_rotation_limit = SETTING_SERVO_AUTOTRIM_ROTATION_LIMIT_DEFAULT
 );
 
+PG_REGISTER_WITH_RESET_TEMPLATE(manufacturerConfig_t, manufacturerConfig, PG_MANUFACTURER_CONFIG, 1);
+
+PG_RESET_TEMPLATE(manufacturerConfig_t, manufacturerConfig,
+    .fixedWingDifferentialThrustThrottleCompensation = SETTING_FW_DIFF_THRUST_THROTTLE_COMPENSATION_DEFAULT,
+    .servo_flapping_freq = SETTING_SERVO_FLAPPING_FREQ_DEFAULT,
+    .servo_flapping_waveform = SETTING_SERVO_FLAPPING_WAVEFORM_DEFAULT
+);
 
 void Reset_servoMixers(servoMixer_t *instance)
 {

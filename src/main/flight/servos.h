@@ -165,8 +165,6 @@ typedef struct servoConfig_s {
     // PWM values, in milliseconds, common range is 1000-2000 (1ms to 2ms)
     uint16_t servoCenterPulse;              // This is the value for servos when they should be in the middle. e.g. 1500.
     uint16_t servoPwmRate;                  // The update rate of servo outputs (50-498Hz)
-    uint8_t servo_flapping_freq;            // Max mechanical flapping frequency in Hz when throttle is at full scale
-    uint8_t servo_flapping_waveform;        // See flappingWaveformType_e
     int16_t servo_lowpass_freq;             // lowpass servo filter frequency selection; 1/1000ths of loop freq
     uint16_t flaperon_throw_offset;
     uint8_t servo_protocol;                 // See servoProtocolType_e
@@ -176,6 +174,14 @@ typedef struct servoConfig_s {
 } servoConfig_t;
 
 PG_DECLARE(servoConfig_t, servoConfig);
+
+typedef struct manufacturerConfig_s {
+    uint8_t fixedWingDifferentialThrustThrottleCompensation;
+    uint8_t servo_flapping_freq;
+    uint8_t servo_flapping_waveform;
+} manufacturerConfig_t;
+
+PG_DECLARE(manufacturerConfig_t, manufacturerConfig);
 
 typedef struct servoMetadata_s {
     float scaleMax;
