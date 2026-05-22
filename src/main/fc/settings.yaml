@@ -29,7 +29,9 @@ tables:
   - name: motor_pwm_protocol
     values: ["STANDARD", "ONESHOT125", "MULTISHOT", "BRUSHED", "DSHOT150", "DSHOT300", "DSHOT600"]
   - name: servo_protocol
-    values: ["PWM", "SBUS", "SBUS_PWM", "PWM_INV"]
+    values: ["PWM", "SBUS", "SBUS_PWM", "PWM_INV", "PWM_FLAPPING"]
+  - name: flapping_waveform
+    values: ["COSINE", "ASYM_DOWN_FAST"]
   - name: failsafe_procedure
     values: ["LAND", "DROP", "RTH", "NONE"]
   - name: current_sensor
@@ -1297,7 +1299,6 @@ groups:
         field: mixer_config.transition_PID_mmix_multiplier_yaw
         min: -5000
         max: 5000
-
   - name: PG_REVERSIBLE_MOTORS_CONFIG
     type: reversibleMotorsConfig_t
     members:
@@ -1325,7 +1326,7 @@ groups:
     headers: ["flight/servos.h"]
     members:
       - name: servo_protocol
-        description: "An option to chose the protocol/option that would be used to output servo data. Possible options `PWM` (FC servo outputs), `SBUS` (S.Bus protocol output via a configured serial port), `PWM_INV` (PWM with inverted duty cycle)"
+        description: "An option to chose the protocol/option that would be used to output servo data. Possible options `PWM` (FC servo outputs), `SBUS` (S.Bus protocol output via a configured serial port), `PWM_INV` (PWM with inverted duty cycle), `PWM_FLAPPING` (normal PWM signaling with throttle-controlled flapping motion around the commanded midpoint)"
         default_value: "PWM"
         field: servo_protocol
         table: servo_protocol
@@ -2041,9 +2042,9 @@ groups:
         max: 200
       - name: fw_reference_airspeed
         description: "Reference airspeed. Set this to airspeed at which PIDs were tuned. Usually should be set to cruise airspeed. Also used for coordinated turn calculation if airspeed sensor is not present."
-        default_value: 1500
+        default_value: 0
         field: fixedWingReferenceAirspeed
-        min: 300
+        min: 0
         max: 6000
       - name: fw_turn_assist_yaw_gain
         description: "Gain required to keep the yaw rate consistent with the turn rate for a coordinated turn (in TURN_ASSIST mode). Value significantly different from 1.0 indicates a problem with the airspeed calibration (if present) or value of `fw_reference_airspeed` parameter"
@@ -2332,8 +2333,8 @@ groups:
         description: "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
         default_value: 0
         field: fixedWingLevelTrim
-        min: -10
-        max: 10
+        min: -50
+        max: 50
       - name: smith_predictor_strength
         description: "The strength factor of a Smith Predictor of PID measurement. In percents"
         default_value: 0.5
@@ -4501,3 +4502,26 @@ groups:
         field: noWayHomeAction
         table: geozone_rth_no_way_home
         type: uint8_t
+
+  - name: PG_MANUFACTURER_CONFIG
+    type: manufacturerConfig_t
+    headers: ["flight/servos.h"]
+    members:
+      - name: fw_diff_thrust_throttle_compensation
+        description: "Extra throttle compensation percentage applied in AIRPLANE mode to offset the lowest motor drop caused by differential thrust yaw mixing. 0 disables it, 100 compensates the full yaw-induced drop."
+        default_value: 0
+        field: fixedWingDifferentialThrustThrottleCompensation
+        type: uint8_t
+        min: 0
+        max: 200
+      - name: servo_flapping_freq
+        description: "Maximum mechanical flapping frequency in Hz for `PWM_FLAPPING`. Throttle is mapped linearly from 0Hz at low stick to this value at full stick."
+        default_value: 10
+        field: servo_flapping_freq
+        min: 1
+        max: 50
+      - name: servo_flapping_waveform
+        description: "Waveform used by `PWM_FLAPPING`. `COSINE` is symmetric and starts from an endpoint. `ASYM_DOWN_FAST` compresses the positive stroke into a shorter time slice, so that stroke is faster; reverse the servo if your mechanism needs the opposite direction."
+        default_value: "COSINE"
+        field: servo_flapping_waveform
+        table: flapping_waveform

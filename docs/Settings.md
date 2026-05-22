@@ -1282,6 +1282,16 @@ Fixed wing rate stabilisation D-gain for YAW
 
 ---
 
+### fw_diff_thrust_throttle_compensation
+
+Extra throttle compensation percentage applied in AIRPLANE mode to offset the lowest motor drop caused by differential thrust yaw mixing. 0 disables it, 100 compensates the full yaw-induced drop.
+
+| Default | Min | Max |
+| --- | --- | --- |
+| 0 | 0 | 200 |
+
+---
+
 ### fw_ff_pitch
 
 Fixed-wing rate stabilisation FF-gain for PITCH
@@ -1398,7 +1408,7 @@ Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose sh
 
 | Default | Min | Max |
 | --- | --- | --- |
-| 0 | -10 | 10 |
+| 0 | -50 | 50 |
 
 ---
 
@@ -1468,7 +1478,7 @@ Reference airspeed. Set this to airspeed at which PIDs were tuned. Usually shoul
 
 | Default | Min | Max |
 | --- | --- | --- |
-| 1500 | 300 | 6000 |
+| 0 | 0 | 6000 |
 
 ---
 
@@ -6072,6 +6082,26 @@ Servo midpoint
 
 ---
 
+### servo_flapping_freq
+
+Maximum mechanical flapping frequency in Hz for `PWM_FLAPPING`. Throttle is mapped linearly from 0Hz at low stick to this value at full stick.
+
+| Default | Min | Max |
+| --- | --- | --- |
+| 10 | 1 | 50 |
+
+---
+
+### servo_flapping_waveform
+
+Waveform used by `PWM_FLAPPING`. `COSINE` is symmetric and starts from an endpoint. `ASYM_DOWN_FAST` compresses the positive stroke into a shorter time slice, so that stroke is faster; reverse the servo if your mechanism needs the opposite direction.
+
+| Default | Min | Max |
+| --- | --- | --- |
+| COSINE |  |  |
+
+---
+
 ### servo_lpf_hz
 
 Selects the servo PWM output cutoff frequency. Value is in [Hz]
@@ -6084,7 +6114,7 @@ Selects the servo PWM output cutoff frequency. Value is in [Hz]
 
 ### servo_protocol
 
-An option to chose the protocol/option that would be used to output servo data. Possible options `PWM` (FC servo outputs), `SBUS` (S.Bus protocol output via a configured serial port), `PWM_INV` (PWM with inverted duty cycle)
+An option to chose the protocol/option that would be used to output servo data. Possible options `PWM` (FC servo outputs), `SBUS` (S.Bus protocol output via a configured serial port), `PWM_INV` (PWM with inverted duty cycle), `PWM_FLAPPING` (normal PWM signaling with throttle-controlled flapping motion around the commanded midpoint)
 
 | Default | Min | Max |
 | --- | --- | --- |

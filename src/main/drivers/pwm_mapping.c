@@ -377,7 +377,8 @@ static bool servosUseHardwareTimers(void)
 {
     return servoConfig()->servo_protocol == SERVO_TYPE_PWM ||
         servoConfig()->servo_protocol == SERVO_TYPE_SBUS_PWM || 
-        servoConfig()->servo_protocol == SERVO_TYPE_PWM_INV;
+        servoConfig()->servo_protocol == SERVO_TYPE_PWM_INV ||
+        servoConfig()->servo_protocol == SERVO_TYPE_PWM_FLAPPING;
 }
 
 static void pwmInitMotors(timMotorServoHardware_t * timOutputs)

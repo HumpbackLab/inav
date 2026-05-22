@@ -175,6 +175,14 @@ typedef struct servoConfig_s {
 
 PG_DECLARE(servoConfig_t, servoConfig);
 
+typedef struct manufacturerConfig_s {
+    uint8_t fixedWingDifferentialThrustThrottleCompensation;
+    uint8_t servo_flapping_freq;
+    uint8_t servo_flapping_waveform;
+} manufacturerConfig_t;
+
+PG_DECLARE(manufacturerConfig_t, manufacturerConfig);
+
 typedef struct servoMetadata_s {
     float scaleMax;
     float scaleMin;

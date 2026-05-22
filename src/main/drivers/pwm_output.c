@@ -44,6 +44,9 @@
 
 #include "drivers/timer_impl.h"
 #include "drivers/timer.h"
+#include "flight/mixer.h"
+#include "flight/servos.h"
+#include "rx/rx.h"
 
 #define MULTISHOT_5US_PW    (MULTISHOT_TIMER_HZ * 5 / 1000000.0f)
 #define MULTISHOT_20US_MULT (MULTISHOT_TIMER_HZ * 20 / 1000000.0f / 1000.0f)
@@ -106,6 +109,9 @@ static pwmWriteFuncPtr         motorWritePtr = NULL;    // Function to write val
 
 static pwmOutputPort_t *       servos[MAX_SERVOS];
 static pwmWriteFuncPtr         servoWritePtr = NULL;    // Function to write value to motors
+static timeUs_t                servoFlappingLastUpdateUs;
+static float                   servoFlappingPhase;
+static float                   servoFlappingOffset;
 
 static pwmOutputPort_t  beeperPwmPort;
 static pwmOutputPort_t *beeperPwm;
@@ -651,6 +657,79 @@ static void pwmServoWriteInverted(uint8_t index, uint16_t value)
     }
 }
 
+typedef enum {
+    FLAPPING_WAVEFORM_COSINE = 0,
+    FLAPPING_WAVEFORM_ASYM_DOWN_FAST
+} flappingWaveformType_e;
+
+static float getFlappingWaveformOffset(float phase)
+{
+    switch (manufacturerConfig()->servo_flapping_waveform) {
+    default:
+    case FLAPPING_WAVEFORM_COSINE:
+        return cos_approx(phase);
+
+    case FLAPPING_WAVEFORM_ASYM_DOWN_FAST: {
+        const float cycle = phase / (2.0f * M_PIf);
+        const float fastStrokePortion = 0.35f;
+        float remappedPhase;
+
+        if (cycle < fastStrokePortion) {
+            const float strokeProgress = cycle / fastStrokePortion;
+            remappedPhase = strokeProgress * M_PIf;
+        } else {
+            const float strokeProgress = (cycle - fastStrokePortion) / (1.0f - fastStrokePortion);
+            remappedPhase = M_PIf + strokeProgress * M_PIf;
+        }
+
+        return cos_approx(remappedPhase);
+    }
+    }
+}
+
+static void updateFlappingOffset(void)
+{
+    const uint16_t throttle = constrain(mixerThrottleCommand, PWM_RANGE_MIN, PWM_RANGE_MAX);
+    const float flappingFrequencyHz = ((float)(throttle - PWM_RANGE_MIN) * manufacturerConfig()->servo_flapping_freq) / (PWM_RANGE_MAX - PWM_RANGE_MIN);
+    const timeUs_t currentTimeUs = micros();
+
+    if (servoFlappingLastUpdateUs == 0 || flappingFrequencyHz <= 0.0f) {
+        servoFlappingLastUpdateUs = currentTimeUs;
+        servoFlappingPhase = 0.0f;
+        servoFlappingOffset = 0.0f;
+        return;
+    }
+
+    const float deltaTime = (currentTimeUs - servoFlappingLastUpdateUs) * 1e-6f;
+    servoFlappingLastUpdateUs = currentTimeUs;
+    servoFlappingPhase += 2.0f * M_PIf * flappingFrequencyHz * deltaTime;
+
+    while (servoFlappingPhase >= 2.0f * M_PIf) {
+        servoFlappingPhase -= 2.0f * M_PIf;
+    }
+
+    servoFlappingOffset = getFlappingWaveformOffset(servoFlappingPhase);
+}
+
+static void pwmServoWriteFlapping(uint8_t index, uint16_t value)
+{
+    if (index == 0) {
+        updateFlappingOffset();
+    }
+
+    if (index < MAX_SERVOS && servos[index]) {
+        const uint8_t servoIndex = getMinServoIndex() + index;
+        const servoParam_t *servoParam = servoParams(servoIndex);
+        const uint16_t center = constrain(value, servoParam->min, servoParam->max);
+        const int16_t amplitude = MIN(center - servoParam->min, servoParam->max - center);
+        const float servoPhaseOffset = (servoParam->rate < 0) ? M_PIf : 0.0f;
+        const float flappingOffset = getFlappingWaveformOffset(servoFlappingPhase + servoPhaseOffset);
+        const uint16_t flappingValue = lrintf(center + (amplitude * flappingOffset));
+        //*servos[index]->ccr = flappingValue;
+        pwmServoWriteInverted(index, flappingValue); // we need to invert to apply for humpbacklab.
+    }
+}
+
 #ifdef USE_SERVO_SBUS
 static void sbusPwmWriteStandard(uint8_t index, uint16_t value)
 {
@@ -661,6 +740,10 @@ static void sbusPwmWriteStandard(uint8_t index, uint16_t value)
 
 void pwmServoPreconfigure(void)
 {
+    servoFlappingLastUpdateUs = 0;
+    servoFlappingPhase = 0.0f;
+    servoFlappingOffset = 0.0f;
+
     // Protocol-specific configuration
     switch (servoConfig()->servo_protocol) {
         default:
@@ -670,6 +753,10 @@ void pwmServoPreconfigure(void)
 
         case SERVO_TYPE_PWM_INV:
             servoWritePtr = pwmServoWriteInverted;
+            break;
+
+        case SERVO_TYPE_PWM_FLAPPING:
+            servoWritePtr = pwmServoWriteFlapping;
             break;
 
 #ifdef USE_SERVO_SBUS

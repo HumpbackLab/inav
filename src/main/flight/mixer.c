@@ -473,6 +473,41 @@ void stopPwmAllMotors(void)
 
 }
 
+static int16_t getFixedWingDifferentialThrustThrottleCompensation(int16_t yawInput)
+{
+    if (!STATE(AIRPLANE) || motorCount < 2) {
+        return 0;
+    }
+
+    if (manufacturerConfig()->fixedWingDifferentialThrustThrottleCompensation == 0) {
+        return 0;
+    }
+
+    bool hasPositiveYawWeight = false;
+    bool hasNegativeYawWeight = false;
+    float minYawMix = 0.0f;
+
+    for (int i = 0; i < motorCount; i++) {
+        if (currentMixer[i].throttle <= 0.0f || currentMixer[i].yaw == 0.0f) {
+            continue;
+        }
+
+        hasPositiveYawWeight |= currentMixer[i].yaw > 0.0f;
+        hasNegativeYawWeight |= currentMixer[i].yaw < 0.0f;
+
+        const float yawMix = (-motorYawMultiplier * yawInput * currentMixer[i].yaw) * mixerScale;
+        if (yawMix < minYawMix) {
+            minYawMix = yawMix;
+        }
+    }
+
+    if (!(hasPositiveYawWeight && hasNegativeYawWeight) || minYawMix >= 0.0f) {
+        return 0;
+    }
+
+    return lrintf(-minYawMix * manufacturerConfig()->fixedWingDifferentialThrustThrottleCompensation / 100.0f);
+}
+
 static int getReversibleMotorsThrottleDeadband(void)
 {
     int directionValue;
@@ -546,6 +581,7 @@ void FAST_CODE mixTable(void)
     int16_t rpyMixRange = rpyMixMax - rpyMixMin;
     int16_t throttleRange;
     int16_t throttleMin, throttleMax;
+    const int16_t differentialThrustThrottleCompensation = getFixedWingDifferentialThrustThrottleCompensation(input[YAW]);
 
     // Find min and max throttle based on condition.
 #ifdef USE_PROGRAMMING_FRAMEWORK
@@ -625,7 +661,8 @@ void FAST_CODE mixTable(void)
     // Now add in the desired throttle, but keep in a range that doesn't clip adjusted
     // roll/pitch/yaw. This could move throttle down, but also up for those low throttle flips.
     for (int i = 0; i < motorCount; i++) {
-        motor[i] = rpyMix[i] + constrain(mixerThrottleCommand * currentMixer[i].throttle, throttleMin, throttleMax);
+        const int16_t throttleCommandWithCompensation = mixerThrottleCommand + differentialThrustThrottleCompensation;
+        motor[i] = rpyMix[i] + constrain(throttleCommandWithCompensation * currentMixer[i].throttle, throttleMin, throttleMax);
 
         if (failsafeIsActive()) {
             motor[i] = constrain(motor[i], motorConfig()->mincommand, getMaxThrottle());

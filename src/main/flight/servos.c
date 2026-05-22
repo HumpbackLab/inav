@@ -72,6 +72,13 @@ PG_RESET_TEMPLATE(servoConfig_t, servoConfig,
     .servo_autotrim_rotation_limit = SETTING_SERVO_AUTOTRIM_ROTATION_LIMIT_DEFAULT
 );
 
+PG_REGISTER_WITH_RESET_TEMPLATE(manufacturerConfig_t, manufacturerConfig, PG_MANUFACTURER_CONFIG, 1);
+
+PG_RESET_TEMPLATE(manufacturerConfig_t, manufacturerConfig,
+    .fixedWingDifferentialThrustThrottleCompensation = SETTING_FW_DIFF_THRUST_THROTTLE_COMPENSATION_DEFAULT,
+    .servo_flapping_freq = SETTING_SERVO_FLAPPING_FREQ_DEFAULT,
+    .servo_flapping_waveform = SETTING_SERVO_FLAPPING_WAVEFORM_DEFAULT
+);
 
 void Reset_servoMixers(servoMixer_t *instance)
 {
